@@ -20,9 +20,10 @@
 
 using namespace vex;
 
-motor_group Left(L1, L2);
-motor_group Right(R1, R2);
-motor_group DriveBase(L1, L2, R1, R2);
+motor_group Left = motor_group(L1, L2);
+motor_group Right = motor_group(R1, R2);
+motor_group DriveBase = motor_group(L1, L2, R1, R2);
+timer myTimer = timer();
 
 const double TOLERANCE = 2;
 const double SET_POINT = 500;
@@ -33,33 +34,10 @@ double constrain (double constrainedValue, double maxValue, double minValue) {
   if(constrainedValue > maxValue) {
     return maxValue;
   }
-  if(constrainedValue < -maxValue) {
-    return -maxValue;
-  }
-  if(constrainedValue < minValue && constrainedValue >= 0) {
+  if(constrainedValue < minValue) {
     return minValue;
   }
-  if(constrainedValue > -minValue && constrainedValue <= 0) {
-    return -minValue;
-  }
   return constrainedValue;
-}
-
-double pConstant(double endPoint, double currentRotation) {
-  double subPoint = endPoint / 5;
-  if (currentRotation < subPoint) {
-    return 2;
-  } 
-  else if (currentRotation < (subPoint * 2)) {
-    return 6;
-  }
-  else if (currentRotation < (subPoint * 3)) {
-    return 9;
-  }
-  else if (currentRotation < (subPoint * 4)) {
-    return 11;
-  }
-  return 12;
 }
 
 void normalPID() {
@@ -88,39 +66,18 @@ void normalPID() {
 }
 
 void motionProfile() {
-  double motorRotation = DriveBase.rotation(deg);
-  double motorVelocity = 1;
-  double kP = 5;
-  //Accelerate until mid point k
-  while (motorRotation < SET_POINT) {
-    motorRotation = DriveBase.rotation(deg);
-    double error = SET_POINT - motorRotation;
-    motorVelocity = motorRotation / kP;
-
-    motorVelocity = constrain(motorVelocity, MAX_VELOCITY, MIN_VELOCITY);
-    DriveBase.spin(forward, motorVelocity, pct);
-    Brain.Screen.printAt(1, 40, "%f", motorVelocity);
-    Brain.Screen.printAt(1, 80, "%f", motorRotation);
-
-    if(error < TOLERANCE && error > -TOLERANCE) {
-      DriveBase.stop(coast);
-      return;
-    }
-  }
+  double motionTime[11] = {0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5};
+  double vSetPoint[11] = {0, 14, 28, 42, 56, 70, 84, 98, 112, 126, 140};
+  int index = 0;
+  myTimer.clear();
   while(1) {
-    motorRotation = DriveBase.rotation(deg);
-    Brain.Screen.printAt(1, 80, "%f", motorRotation);
+    int currentTime = myTimer.time(timeUnits::sec);
+    DriveBase.spin(forward, vSetPoint[index], dps);
+    if(currentTime > motionTime[index]) {
+      index += 1;
+    }
+    Brain.Screen.printAt(1, 40, "%f", DriveBase.velocity(dps));
   }
-
-  /*
-  //Deccelerate until end point
-  while (motorRotation < endPoint) {
-    double error = endPoint - motorRotation;
-    motorVelocity = error * kP;
-    motorVelocity = constrain(motorVelocity, maxVelocity, -maxVelocity);
-    DriveBase.spin(forward, motorVelocity, percent);
-  }
-  */
   return;
 }
 
