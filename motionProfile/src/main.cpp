@@ -66,15 +66,15 @@ void normalPID() {
 }
 
 void motionProfile() {
-  double motionTime[11] = {0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5};
+  double tSetPoint[11] = {0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5};
   double vSetPoint[11] = {0, 14, 28, 42, 56, 70, 84, 98, 112, 126, 140};
-  int index = 0;
+  int i = 0;
   myTimer.clear();
   while(1) {
     int currentTime = myTimer.time(timeUnits::sec);
-    DriveBase.spin(forward, vSetPoint[index], dps);
-    if(currentTime > motionTime[index]) {
-      index += 1;
+    DriveBase.spin(forward, vSetPoint[i], dps);
+    if(currentTime > tSetPoint[i]) {
+      i += 1;
     }
     Brain.Screen.printAt(1, 40, "%f", DriveBase.velocity(dps));
   }
