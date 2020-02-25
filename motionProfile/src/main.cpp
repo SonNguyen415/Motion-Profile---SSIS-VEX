@@ -40,31 +40,6 @@ double constrain (double constrainedValue, double maxValue, double minValue) {
   return constrainedValue;
 }
 
-void normalPID() {
-  double motorRotation = DriveBase.rotation(deg);
-  double motorVelocity = 1;
-  double kP = 5;
-  while (1) {
-    motorRotation = DriveBase.rotation(deg);
-    double error = SET_POINT - motorRotation;
-    motorVelocity = error / kP;
-
-    motorVelocity = constrain(motorVelocity, MAX_VELOCITY, MIN_VELOCITY);
-    DriveBase.spin(forward, motorVelocity, pct);
-    Brain.Screen.printAt(1, 40, "%f", motorVelocity);
-    Brain.Screen.printAt(1, 80, "%f", motorRotation);
-
-    if(error < TOLERANCE) {
-      DriveBase.stop(coast);
-      return;
-    }
-  }
-  while(1) {
-    motorRotation = DriveBase.rotation(deg);
-    Brain.Screen.printAt(1, 80, "%f", motorRotation);
-  } 
-}
-
 void motionProfile() {
   double tSetPoint[11] = {0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5};
   double vSetPoint[11] = {0, 14, 28, 42, 56, 70, 84, 98, 112, 126, 140};
