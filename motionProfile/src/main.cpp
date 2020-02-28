@@ -41,19 +41,40 @@ double constrain (double constrainedValue, double maxValue, double minValue) {
 }
 
 void motionProfile() {
+<<<<<<< Updated upstream
   double motionTime[11] = {0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5};
   double vSetPoint[11] = {0, 14, 28, 42, 56, 70, 84, 98, 112, 126, 140};
   int index = 0;
+=======
+  double tSetPoint[17] = {0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4};
+  double vSetPoint[17] = {0, 35, 70, 105, 140, 175, 210, 245, 280, 315, 350, 385, 420, 455, 490, 525, 560};
+  int lastElement = sizeof(tSetPoint) / sizeof(tSetPoint[0]) - 1;
+  Brain.Screen.printAt(1, 120, "%d", lastElement);
+  int i = 0;
+>>>>>>> Stashed changes
   myTimer.clear();
+  myTimer.reset();
+  int currentTime = myTimer.value();
   while(1) {
+<<<<<<< Updated upstream
     int currentTime = myTimer.time(timeUnits::sec);
     DriveBase.spin(forward, vSetPoint[index], dps);
     if(currentTime > motionTime[index]) {
       index += 1;
+=======
+    currentTime = myTimer.value();
+    DriveBase.spin(forward, vSetPoint[i], dps);
+    if(currentTime > tSetPoint[i]) {
+      i += 1;
+>>>>>>> Stashed changes
     }
-    Brain.Screen.printAt(1, 40, "%f", DriveBase.velocity(dps));
+    Brain.Screen.printAt(1, 40, "%f", myTimer.value());
+    Brain.Screen.printAt(1, 80, "%f", DriveBase.velocity(dps));
+    if(currentTime > tSetPoint[lastElement]) {
+      DriveBase.stop(coast);
+      return;
+    }
   }
-  return;
 }
 
 int main() {
